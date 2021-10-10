@@ -10,6 +10,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.RiddlesGame">
+        <activity android:name=".RankingAvatarsActivity"/>
+        <activity android:name=".RiddleSolvedActivity"/>
         <activity android:name=".DisplayRiddlesActivity"/>
         <activity android:name=".RiddlesLevelsActivity"/>
         <activity android:name=".MenuActivity"/>

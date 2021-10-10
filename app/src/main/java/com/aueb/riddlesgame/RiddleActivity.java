@@ -220,7 +220,7 @@ public class RiddleActivity extends AppCompatActivity {
 
                                 try {
                                     contract.solve(new BigInteger(String.valueOf(id)));
-                                    Intent intent = new Intent(RiddleActivity.this, DisplayRiddlesActivity.class);
+                                    Intent intent = new Intent(RiddleActivity.this, RiddleSolvedActivity.class);
                                     intent.putExtra("mnemonic", mnemonic);
                                     intent.putExtra("avatar_name", avatar_name);
                                     intent.putExtra("avatar_level", avatar_level);

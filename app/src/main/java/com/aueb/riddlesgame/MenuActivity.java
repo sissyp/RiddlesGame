@@ -1,5 +1,6 @@
 package com.aueb.riddlesgame;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -59,7 +60,9 @@ public class MenuActivity extends AppCompatActivity {
         binding.rankingBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(MenuActivity.this, LoginOrRegisterActivity.class));
+                Intent intent = new Intent(MenuActivity.this, RankingAvatarsActivity.class);
+                intent.putExtra("mnemonic",mnemonic);
+                startActivity(intent);
                 finish();
             }
         });
