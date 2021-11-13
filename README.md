@@ -18,7 +18,7 @@ on the game. By storing a file on IPFS a hash is produced, which is then stored 
 Blockchain. When a user chooses to solve a riddle the unique url that correlates 
 to it is extracted. This process is shown on the diagram bellow.
 
-![overview of the application](app/src/main/res/drawable/overview_of_the_application.PNG)
+![overview of the application](app/src/main/res/drawable/overview_of_application.PNG)
 
 Wrapper classes in Java were used to call the application’s smart contracts. In order to do 
 this solidity’s solcjs compiler and the web3j Java Library were used. After creating the wrapper 
