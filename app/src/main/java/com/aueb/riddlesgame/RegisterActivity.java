@@ -26,7 +26,7 @@ import org.web3j.tx.gas.StaticGasProvider;
 import java.math.BigInteger;
 
 public class RegisterActivity extends AppCompatActivity {
-    private static final String CONTRACT_ADDRESS = "0xFFFD798b32d1B034f70Ec1C06C547A5eA9Fa9E20";
+    private static final String CONTRACT_ADDRESS = "0x27232C655b8C2874EBaB7a1aA5Cc11C8940670b0";
     ActivityRegisterBinding binding;
     Web3j web3;
     String mnemonic;
@@ -53,6 +53,7 @@ public class RegisterActivity extends AppCompatActivity {
                     new Thread( new Runnable() {
                         @Override
                         public void run() {
+                            long start = System.currentTimeMillis();
                             web3 = Web3j.build(new HttpService("https://ropsten.infura.io/v3/78373ee3cac447d7afd989b684806a0f"));
                             try {
                                 Web3ClientVersion clientVersion = web3.web3ClientVersion().sendAsync().get();
@@ -83,8 +84,9 @@ public class RegisterActivity extends AppCompatActivity {
 
                             String name = "";
                             int level = 0;
-
+                            long elapsedTimeMillis = System.currentTimeMillis()-start;
                             try {
+                                long start1 = System.currentTimeMillis();
                                 BigInteger avatars_length = contract.getAvatarsLength().send();
                                 Log.d("avatars_length",avatars_length.toString());
                                 toastAsync(avatars_length.toString());
@@ -108,7 +110,9 @@ public class RegisterActivity extends AppCompatActivity {
                                 toastAsync(name);
                                 level = contract.getLevel(avatarId).send().intValue();
                                 Log.d("avatar_level", String.valueOf(level));
-
+                                long elapsedTimeMillis1 = System.currentTimeMillis()-start;
+                                long totalTime = elapsedTimeMillis + elapsedTimeMillis1;
+                                Log.d("Register", String.valueOf(totalTime));
                             }
                             catch (Exception e) {
                                 e.printStackTrace();

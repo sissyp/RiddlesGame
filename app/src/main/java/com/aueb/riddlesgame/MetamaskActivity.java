@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -60,6 +61,7 @@ public class MetamaskActivity extends AppCompatActivity {
         handler.postDelayed(new Runnable() {
             @Override
                 public void run() {
+                long start = System.currentTimeMillis();
                 EditText editText = findViewById(R.id.privateKey);
 
                 mnemonic = editText.getText().toString();
@@ -79,6 +81,8 @@ public class MetamaskActivity extends AppCompatActivity {
                 Credentials credentials = Credentials.create(derivedKeyPair);
 
                 toastAsync("Connected to your metamask wallet account: " + credentials.getAddress());
+                long elapsedTimeMillis = System.currentTimeMillis()-start;
+                Log.d("MetaMask",String.valueOf(elapsedTimeMillis));
                 onConnectedWithMetamask();
             }
         }, 3000);

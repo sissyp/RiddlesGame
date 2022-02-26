@@ -17,21 +17,28 @@ import org.web3j.crypto.Bip32ECKeyPair;
 import org.web3j.crypto.Credentials;
 import org.web3j.crypto.MnemonicUtils;
 import org.web3j.protocol.Web3j;
+import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.protocol.core.methods.response.Web3ClientVersion;
 import org.web3j.protocol.http.HttpService;
+import org.web3j.tx.RawTransactionManager;
+import org.web3j.tx.TransactionManager;
+import org.web3j.tx.Transfer;
 import org.web3j.tx.gas.ContractGasProvider;
 import org.web3j.tx.gas.DefaultGasProvider;
+import org.web3j.tx.gas.StaticGasProvider;
+import org.web3j.utils.Convert;
 
 import io.ipfs.api.IPFS;
 
 import io.ipfs.multihash.Multihash;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 
 
 public class RiddleActivity extends AppCompatActivity {
-    private static final String CONTRACT_ADDRESS = "0xc8E30394D3C218F09ACEbF44b19CC32c56dddf67";
+    private static final String CONTRACT_ADDRESS = "0x27232C655b8C2874EBaB7a1aA5Cc11C8940670b0";
     ActivityRiddleBinding binding;
     IPFS ipfs;
     String mnemonic;
@@ -43,6 +50,10 @@ public class RiddleActivity extends AppCompatActivity {
     Web3j web3;
     int riddle_solution = 45;
     int id;
+    private final static BigInteger GAS_LIMIT = BigInteger.valueOf(4_100_000_000L);
+    private final static BigInteger GAS_PRICE = BigInteger.valueOf(3_000_000);
+
+    private final static String RECIPIENT = CONTRACT_ADDRESS;
 
     String hash = "QmVV8SErurxVy4Xep6f48BX99iTrWu3c5biEQDoUoLT7rZ";
 
@@ -69,11 +80,13 @@ public class RiddleActivity extends AppCompatActivity {
                 @Override
                 public void run() {
                     try {
+                        long start = System.currentTimeMillis();
                         ipfs = new IPFS("/dnsaddr/ipfs.infura.io/tcp/5001/https");
                         Multihash multihash = Multihash.fromBase58(hash);
                         byte[] content = ipfs.cat(multihash);
                         String content_str = new String(content);
-
+                        long elapsedTimeMillis = System.currentTimeMillis()-start;
+                        Log.d("ExtractFromIPFS",String.valueOf(elapsedTimeMillis));
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
@@ -185,11 +198,12 @@ public class RiddleActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 int user_solution = Integer.parseInt(binding.solution.getText().toString());
-                if(user_solution == riddle_solution) {
+                //if(user_solution == riddle_solution) {
                     try {
                         new Thread(new Runnable() {
                             @Override
                             public void run() {
+                                long start1 = System.currentTimeMillis();
                                 web3 = Web3j.build(new HttpService("https://ropsten.infura.io/v3/78373ee3cac447d7afd989b684806a0f"));
                                 try {
                                     Web3ClientVersion clientVersion = web3.web3ClientVersion().sendAsync().get();
@@ -211,15 +225,35 @@ public class RiddleActivity extends AppCompatActivity {
 
                                 // Load the wallet for the derived key
                                 Credentials credentials = Credentials.create(derivedKeyPair);
-                                ContractGasProvider gasProvider = new DefaultGasProvider();
+                                ContractGasProvider gasProvider = new StaticGasProvider(BigInteger.valueOf(4_100_000_000L),BigInteger.valueOf(4_000_000));
 
                                 toastAsync("Connected to your metamask wallet account: " + credentials.getAddress());
 
-                                RiddlesHelperContract_sol_RiddlesHelperContract contract = RiddlesHelperContract_sol_RiddlesHelperContract.load(CONTRACT_ADDRESS, web3, credentials, gasProvider);
+                                PlayerContract_sol_PlayerContract contract = PlayerContract_sol_PlayerContract.load(CONTRACT_ADDRESS, web3, credentials, gasProvider);
 
 
                                 try {
-                                    contract.solve(new BigInteger(String.valueOf(id)));
+                                    TransactionManager transactionManager = new RawTransactionManager(
+                                            web3,
+                                            credentials
+                                    );
+
+                                    Transfer transfer = new Transfer(web3, transactionManager);
+
+                                    TransactionReceipt transactionReceipt = transfer.sendFunds(
+                                            RECIPIENT,
+                                            BigDecimal.ZERO,
+                                            Convert.Unit.ETHER,
+                                            GAS_PRICE,
+                                            GAS_LIMIT
+                                    ).send();
+                                    contract.solve(new BigInteger(String.valueOf(id))).send();
+                                    //Log.d("Transaction = " , transactionReceipt.getTransactionHash());
+                                    // String x = contract.solve(new BigInteger(String.valueOf(id))).send().getGasUsed().toString();
+                                    int numberOfriddles = contract.getSolved(new BigInteger(String.valueOf(id))).send().intValue();
+                                    long elapsedTimeMillis1 = System.currentTimeMillis()-start1;
+                                    Log.d("RiddleActivity", String.valueOf(elapsedTimeMillis1));
+                                    Log.d("number", String.valueOf(numberOfriddles));
                                     Intent intent = new Intent(RiddleActivity.this, RiddleSolvedActivity.class);
                                     intent.putExtra("mnemonic", mnemonic);
                                     intent.putExtra("avatar_name", avatar_name);
@@ -238,9 +272,9 @@ public class RiddleActivity extends AppCompatActivity {
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                }
-                else
-                    toastAsync("Wrong answer. Try again...");
+                //}
+                //else
+                    //toastAsync("Wrong answer. Try again...");
             }
         });
     }

@@ -2,6 +2,7 @@ package com.aueb.riddlesgame;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -28,6 +29,7 @@ public class DisplayRiddlesActivity extends AppCompatActivity {
         avatar_level = extras.getInt("avatar_level");
         level = extras.getString("level");
         id = extras.getInt("avatar_id");
+        Log.d("id", String.valueOf(id));
         setNameAndLevel();
         setClickListeners();
     }

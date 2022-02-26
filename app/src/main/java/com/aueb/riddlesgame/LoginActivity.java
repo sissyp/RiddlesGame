@@ -24,7 +24,7 @@ import org.web3j.tx.gas.StaticGasProvider;
 import java.math.BigInteger;
 
 public class LoginActivity extends AppCompatActivity {
-    private static final String CONTRACT_ADDRESS = "0xFFFD798b32d1B034f70Ec1C06C547A5eA9Fa9E20";
+    private static final String CONTRACT_ADDRESS = "0x27232C655b8C2874EBaB7a1aA5Cc11C8940670b0";
     ActivityLoginBinding binding;
     String mnemonic;
     Web3j web3;
@@ -50,6 +50,7 @@ public class LoginActivity extends AppCompatActivity {
                     new Thread( new Runnable() {
                         @Override
                         public void run() {
+                            long start = System.currentTimeMillis();
                             web3 = Web3j.build(new HttpService("https://ropsten.infura.io/v3/78373ee3cac447d7afd989b684806a0f"));
                             try {
                                 Web3ClientVersion clientVersion = web3.web3ClientVersion().sendAsync().get();
@@ -105,11 +106,14 @@ public class LoginActivity extends AppCompatActivity {
                                 toastAsync(name);
                                 level = contract.getLevel((new BigInteger(String.valueOf(id)))).send().intValue();
                                 Log.d("avatar_level", String.valueOf(level));
+                                Log.d("avatar_id",String.valueOf(id));
 
                             }
                             catch (Exception e) {
                                 e.printStackTrace();
                             }
+                            long elapsedTimeMillis = System.currentTimeMillis()-start;
+                            Log.d("Login", String.valueOf(elapsedTimeMillis));
                             Intent intent = new Intent(LoginActivity.this, MenuActivity.class);
                             intent.putExtra("mnemonic",mnemonic);
                             intent.putExtra("avatar_name", name);

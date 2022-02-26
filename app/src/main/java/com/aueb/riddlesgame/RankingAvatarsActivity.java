@@ -28,7 +28,7 @@ import org.web3j.tx.gas.DefaultGasProvider;
 import org.web3j.tx.gas.StaticGasProvider;
 
 public class RankingAvatarsActivity extends AppCompatActivity {
-    private static final String CONTRACT_ADDRESS = "0xFFFD798b32d1B034f70Ec1C06C547A5eA9Fa9E20";
+    private static final String CONTRACT_ADDRESS = "0x27232C655b8C2874EBaB7a1aA5Cc11C8940670b0";
     TextView first;
     TextView second;
     TextView third;
@@ -53,6 +53,7 @@ public class RankingAvatarsActivity extends AppCompatActivity {
             @Override
             public void run() {
                 try {
+                    long start = System.currentTimeMillis();
                     web3 = Web3j.build(new HttpService("https://ropsten.infura.io/v3/78373ee3cac447d7afd989b684806a0f"));
                     try {
                         Web3ClientVersion clientVersion = web3.web3ClientVersion().sendAsync().get();
@@ -84,8 +85,9 @@ public class RankingAvatarsActivity extends AppCompatActivity {
                     int level = 0;
                     int id = 0;
 
-
+                    long elapsedTimeMillis = System.currentTimeMillis()-start;
                     try {
+                        long start1 = System.currentTimeMillis();
                         BigInteger avatars_length = contract.getAvatarsLength().send();
                         for (int i = 0; i < avatars_length.intValue(); i++) {
                             id = i;
@@ -98,6 +100,9 @@ public class RankingAvatarsActivity extends AppCompatActivity {
                         first.setText(avatars.get(0).username);
                         second.setText(avatars.get(1).username);
                         third.setText(avatars.get(2).username);
+                        long elapsedTimeMillis1 = System.currentTimeMillis()-start;
+                        long totalTime = elapsedTimeMillis + elapsedTimeMillis1;
+                        Log.d("Ranking", String.valueOf(totalTime));
 
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -106,6 +111,7 @@ public class RankingAvatarsActivity extends AppCompatActivity {
                 catch (Exception exception) {
                     exception.printStackTrace();
                 }
+
             }
         };thread2.start();
     }
