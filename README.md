@@ -1,7 +1,5 @@
 # RiddlesGame
 
-This repository contains the application code for my Bachelor thesis.
-
 RiddlesGame is an Android application on the Ethereum private blockchain with the 
 use of smart contracts and IPFS. It is a game that offers a range of mathematical riddles at 
 three levels of difficulty; Easy, Medium and Hard. Users can solve riddles from any 
